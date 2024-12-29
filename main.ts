@@ -11,7 +11,6 @@ export default class ConfluenceToolkit extends Plugin {
 			name: 'Convert to Confluence and Copy to Clipboard',
 			editorCheckCallback: (checking: boolean, editor, ctx) => {
 				if (ctx instanceof MarkdownView) {
-					console.log('ctx', ctx);
 					if (!checking) {
 						this.convert2Clipboard();
 					}

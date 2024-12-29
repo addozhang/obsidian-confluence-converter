@@ -1,11 +1,10 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
-	"version": "1.0.0",
+	"id": "confluence-converter",
+	"name": "Confluence Converter",
+	"version": "0.0.1",
 	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
-	"isDesktopOnly": false
+	"description": "An obsidian plugin for converting markdown to Confluence wiki markup.",
+	"author": "Addo Zhang",
+	"authorUrl": "https://atbug.com",
+	"isDesktopOnly": true
 }

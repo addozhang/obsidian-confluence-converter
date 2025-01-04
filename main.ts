@@ -1,11 +1,28 @@
-import {MarkdownView, Plugin} from 'obsidian';
-import {marked} from "marked";
-import {AtlassianWikiMarkupRenderer} from "./confluenceRender";
+import {MarkdownView, Notice, Plugin} from 'obsidian';
+import {marked, Hooks, TokensList, Token} from "marked";
+import {AtlassianWikiMarkupRenderer, MarkdownToAtlassianWikiMarkupOptions} from "./confluenceRender";
+import ConverterSettingTab from "./converterSettingTab";
 
+interface ConverterSettings {
+	codeBlockTheme: string;
+	codeBlockShowLineNumbers: boolean;
+	codeBlockCollapse: boolean;
+	debug: boolean;
+}
 
-export default class ConfluenceToolkit extends Plugin {
+const DEFAULT_SETTINGS: ConverterSettings = {
+	codeBlockTheme: "Confluence",
+	codeBlockShowLineNumbers: false,
+	codeBlockCollapse: false,
+	debug: false
+}
+
+export default class ConfluenceConverter extends Plugin {
+
+	settings: ConverterSettings;
 
 	async onload() {
+		await this.loadSettings();
 		this.addCommand({
 			id: 'convert-to-confluence-to-clipboard',
 			name: 'Convert to Confluence and Copy to Clipboard',
@@ -19,13 +36,18 @@ export default class ConfluenceToolkit extends Plugin {
 				return false;
 			}
 		});
-		this.addRibbonIcon('Confluence', 'Confluence Markup', async () => {
-			await this.convert2Clipboard();
-		});
+		// this.addRibbonIcon('home', 'Confluence Wiki Markup', async () => {
+		// 	await this.convert2Clipboard();
+		// });
+		this.addSettingTab(new ConverterSettingTab(this.app, this));
 	}
 
 	onunload() {
 
+	}
+
+	async loadSettings() {
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, (await this.loadData()) as ConverterSettings);
 	}
 
 	private async convert2Clipboard() {
@@ -33,9 +55,29 @@ export default class ConfluenceToolkit extends Plugin {
 		if(!editor) {
 			return
 		}
+		const options: MarkdownToAtlassianWikiMarkupOptions = {
+			codeBlock: {
+				theme: this.settings.codeBlockTheme as any,
+				showLineNumbers: this.settings.codeBlockShowLineNumbers,
+				collapse: this.settings.codeBlockCollapse
+			}
+		}
 		let content = editor.getSelection() ? editor.getSelection() : editor.getValue();
-		let converted = await marked(content, {renderer: new AtlassianWikiMarkupRenderer()});
-		navigator.clipboard.writeText(converted);
+		let converted = marked.parse(content, {
+			renderer: new AtlassianWikiMarkupRenderer(options),
+			async: false,
+			hooks: this.settings.debug ? new TokenPrint() : null,
+		});
+		navigator.clipboard.writeText(converted)
+			.then(_ => new Notice("Copied to clipboard"));
+	}
+}
+
+class TokenPrint extends Hooks {
+
+	processAllTokens(tokens: Token[] | TokensList): Token[] | TokensList {
+		console.log("parsed tokens",tokens)
+		return super.processAllTokens(tokens);
 	}
 }
 

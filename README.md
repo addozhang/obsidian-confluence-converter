@@ -4,13 +4,13 @@ This plugin for [Obsidian](https://obsidian.md) enables seamless interaction wit
 
 ## Features
 
-- Convert Markdown content from an Obsidian note to Confluence wiki markup format.
+- Convert Markdown content from an Obsidian note to [Confluence Wiki Markup](https://confluence.atlassian.com/doc/confluence-wiki-markup-251003035.html) format.
 - Copy the converted content directly to the clipboard.
 
 ## Installation
 
-1. Download the latest release from the [Releases](https://github.com/your-repo/releases) page.
-2. Extract the contents into your Obsidian plugins folder.
+1. Download the latest release from the [Releases](https://github.com/addozhang/obsidian-confluence-converter/releases) page.
+2. Extract the contents into the `.obsidian/plugins` folder in your vault.
 3. Enable the plugin from the Obsidian settings.
 
 ## Usage

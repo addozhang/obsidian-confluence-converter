@@ -123,16 +123,20 @@ const unescapeHtmlSpecialCharacteres = (text: string): string => {
 };
 
 export class AtlassianWikiMarkupRenderer extends Renderer {
-	private rendererOptions?: MarkdownToAtlassianWikiMarkupOptions;
+	private readonly rendererOptions?: MarkdownToAtlassianWikiMarkupOptions;
 
 	public constructor(rendererOptions?: MarkdownToAtlassianWikiMarkupOptions) {
 		super();
 		this.rendererOptions = rendererOptions;
 	}
 
-	public paragraph({text}: Tokens.Paragraph): string {
+	public paragraph({text, tokens}: Tokens.Paragraph): string {
+		let out = '';
+		if (tokens.length > 0) {
+			out = this.parser.parseInline(tokens, this);
+		}
 		const replacedText = replaceSingleNewlineWithSpace(
-			text,
+			out,
 			this.rendererOptions
 		);
 		const unescapedText = unescapeHtmlSpecialCharacteres(replacedText);
@@ -143,12 +147,20 @@ export class AtlassianWikiMarkupRenderer extends Renderer {
 		return `h${depth}. ${text}\n\n`;
 	}
 
-	public strong({text}: Tokens.Strong): string {
-		return `*${text}*`;
+	public strong({text, tokens}: Tokens.Strong): string {
+		let out = text;
+		if(tokens[0]?.type !== "text") {
+			out = this.parser.parseInline(tokens, this);
+		}
+		return `*${out}*`;
 	}
 
-	public em({text}: Tokens.Em): string {
-		return `_${text}_`;
+	public em({text, tokens}: Tokens.Em): string {
+		let out = text;
+		if(tokens[0]?.type !== "text") {
+			out = this.parser.parseInline(tokens, this);
+		}
+		return `_${out}_`;
 	}
 
 	public del({text}: Tokens.Del): string {
@@ -160,7 +172,7 @@ export class AtlassianWikiMarkupRenderer extends Renderer {
 	}
 
 	public blockquote({text}: Tokens.Blockquote): string {
-		return `{quote}${text.trim()}{quote}`;
+		return `{quote}${text.trim()}{quote}\n`;
 	}
 
 	public br(): string {
@@ -171,34 +183,41 @@ export class AtlassianWikiMarkupRenderer extends Renderer {
 		return "----\n";
 	}
 
-	public link({text, href, title}: Tokens.Link): string {
+	public link({href, title, text}: Tokens.Link): string {
 		const linkAlias = text === "" ? title : text;
-
 		return linkAlias ? `[${linkAlias}|${href}]` : `[${href}]`;
 	}
 
 
-	public list({raw, ordered, start}: Tokens.List): string {
-		const lines = raw
-			.trim()
-			.split("\n")
-			.filter((line) => !!line);
-		const type = ordered
-			? ListHeadCharacter.Numbered
-			: ListHeadCharacter.Bullet;
-		const joinedLine = lines
-			.map((line) => {
-				return line.match(confluenceListRegExp)
-					? `${type}${line}`
-					: `${type} ${line}`;
-			})
-			.join("\n");
-
-		return `\n${joinedLine}\n\n`;
+	public list({items, ordered}: Tokens.List): string {
+		let body = '';
+		const type = ordered ? ListHeadCharacter.Numbered : ListHeadCharacter.Bullet;
+		for (let i = 0; i < items.length; i++) {
+			const item = items[i];
+			let itemBody = this.listitem(item);
+			body += itemBody
+		}
+		body = body.trim()
+			.split('\n')
+			.filter((line) => !!line)
+			.map(line => line.match(confluenceListRegExp)
+				? `${type}${line}`
+				: `${type} ${line}`
+			)
+			.join('\n');
+		return `${body}\n\n`;
 	}
 
-	public listitem({text}: Tokens.ListItem): string {
-		return `${text}\n`;
+
+	public listitem(item: Tokens.ListItem): string {
+		let itemBody = '';
+		if (item.tokens[0]?.type === "text") {
+			itemBody += `${item.tokens[0].text}\n`;
+		}
+		if (item.tokens.length > 1) {
+			itemBody += this.parser.parse(item.tokens.slice(1), !!item.loose);
+		}
+		return `${itemBody}\n`;
 	}
 
 	public checkbox({checked}: Tokens.Checkbox): string {
@@ -224,19 +243,22 @@ export class AtlassianWikiMarkupRenderer extends Renderer {
 	}
 
 	public table({header, rows}: Tokens.Table): string {
-		console.log("header", header);
-		console.log("rows", rows);
-		const tableContent = header
-			.map((cell, index) =>
-				`||${cell.text}|${rows.map((row) => row[index].text).join("|")}|`
-			)
-			.join("\n");
-		;
-		return `${tableContent}\n`;
+		let out = '';
+		let headerBody = header
+			.map(cell => `|${cell.text}|`)
+			.join('');
+		out += `|${headerBody}|`
+		rows.forEach(row => {
+			let rowBody = row
+				.map(cell => cell.text.replace('<br>', '\\\\') || ' ')
+				.join('|');
+			out += `\n|${rowBody}|`
+		})
+
+		return `${out}\n`;
 	}
 
 	public tablerow({text}: Tokens.TableRow): string {
-		console.log("text", text);
 		const removedEscapePipe = text.replace("\\|", "");
 		const twoPipeMatch = removedEscapePipe.match(/\|\|(?!.*\|\|)/);
 		const onePipeMatch = removedEscapePipe.match(/\|(?!.*\|)/);

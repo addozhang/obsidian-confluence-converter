@@ -1,6 +1,6 @@
 import {MarkdownView, Notice, Plugin} from 'obsidian';
 import {marked, Hooks, TokensList, Token} from "marked";
-import {AtlassianWikiMarkupRenderer, MarkdownToAtlassianWikiMarkupOptions} from "./confluenceRender";
+import {AtlassianWikiMarkupRenderer, CodeBlockTheme, MarkdownToAtlassianWikiMarkupOptions} from "./confluenceRender";
 import ConverterSettingTab from "./converterSettingTab";
 
 interface ConverterSettings {
@@ -57,7 +57,7 @@ export default class ConfluenceConverter extends Plugin {
 		}
 		const options: MarkdownToAtlassianWikiMarkupOptions = {
 			codeBlock: {
-				theme: this.settings.codeBlockTheme as any,
+				theme: CodeBlockTheme[this.settings.codeBlockTheme as keyof typeof CodeBlockTheme],
 				showLineNumbers: this.settings.codeBlockShowLineNumbers,
 				collapse: this.settings.codeBlockCollapse
 			}

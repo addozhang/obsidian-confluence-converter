@@ -13,12 +13,11 @@ export default class ConverterSettingTab extends PluginSettingTab {
 	display(): void {
 		const {containerEl} = this;
 		containerEl.empty()
-		containerEl.createEl("h1", {text: "Confluence Converter Settings"});
 
 		const codeBlock = containerEl.createDiv();
 
 		new Setting(codeBlock)
-			.setName("CodeBlock Theme")
+			.setName("Code block theme")
 			.setDesc("Select the code block theme.")
 			.addDropdown(dd => {
 				Object.entries(CodeBlockTheme).forEach(([key, value]) => {
@@ -31,7 +30,7 @@ export default class ConverterSettingTab extends PluginSettingTab {
 			});
 
 		new Setting(codeBlock)
-			.setName("Show Line Numbers")
+			.setName("Show line numbers")
 			.setDesc("Show line numbers in code block.")
 			.addToggle(toggle => {
 				toggle.setValue(this.plugin.settings.codeBlockShowLineNumbers);
@@ -41,22 +40,12 @@ export default class ConverterSettingTab extends PluginSettingTab {
 			});
 
 		new Setting(codeBlock)
-			.setName("Collapse Code Block")
+			.setName("Collapse code block")
 			.setDesc("Collapse code block.")
 			.addToggle(toggle => {
 				toggle.setValue(this.plugin.settings.codeBlockCollapse);
 				toggle.onChange(async (value) => {
 					this.plugin.settings.codeBlockCollapse = value;
-				});
-			});
-
-		new Setting(codeBlock)
-			.setName("Debug")
-			.setDesc("Enable debug mode to print all parse tokens.")
-			.addToggle(toggle => {
-				toggle.setValue(this.plugin.settings.debug);
-				toggle.onChange(async (value) => {
-					this.plugin.settings.debug = value;
 				});
 			});
 	}

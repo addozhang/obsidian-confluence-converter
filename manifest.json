@@ -1,9 +1,9 @@
 {
 	"id": "confluence-converter",
 	"name": "Confluence Converter",
-	"version": "0.1.1",
+	"version": "0.2.0",
 	"minAppVersion": "0.15.0",
-	"description": "An plugin for converting markdown to Confluence wiki markup.",
+	"description": "Convert markdown to Confluence wiki markup.",
 	"author": "Addo Zhang",
 	"authorUrl": "https://atbug.com",
 	"isDesktopOnly": true

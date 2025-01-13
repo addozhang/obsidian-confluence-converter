@@ -1,5 +1,5 @@
 import {MarkdownView, Notice, Plugin} from 'obsidian';
-import {marked, Hooks, TokensList, Token} from "marked";
+import {marked} from "marked";
 import {AtlassianWikiMarkupRenderer, CodeBlockTheme, MarkdownToAtlassianWikiMarkupOptions} from "./confluenceRender";
 import ConverterSettingTab from "./converterSettingTab";
 
@@ -7,14 +7,12 @@ interface ConverterSettings {
 	codeBlockTheme: string;
 	codeBlockShowLineNumbers: boolean;
 	codeBlockCollapse: boolean;
-	debug: boolean;
 }
 
 const DEFAULT_SETTINGS: ConverterSettings = {
 	codeBlockTheme: "Confluence",
 	codeBlockShowLineNumbers: false,
 	codeBlockCollapse: false,
-	debug: false
 }
 
 export default class ConfluenceConverter extends Plugin {
@@ -25,7 +23,7 @@ export default class ConfluenceConverter extends Plugin {
 		await this.loadSettings();
 		this.addCommand({
 			id: 'convert-to-confluence-to-clipboard',
-			name: 'Convert to Confluence and Copy to Clipboard',
+			name: 'Convert to Confluence wiki markup and copy to clipboard',
 			editorCheckCallback: (checking: boolean, editor, ctx) => {
 				if (ctx instanceof MarkdownView) {
 					if (!checking) {
@@ -66,18 +64,9 @@ export default class ConfluenceConverter extends Plugin {
 		let converted = marked.parse(content, {
 			renderer: new AtlassianWikiMarkupRenderer(options),
 			async: false,
-			hooks: this.settings.debug ? new TokenPrint() : null,
 		});
 		navigator.clipboard.writeText(converted)
 			.then(_ => new Notice("Copied to clipboard"));
-	}
-}
-
-class TokenPrint extends Hooks {
-
-	processAllTokens(tokens: Token[] | TokensList): Token[] | TokensList {
-		console.log("parsed tokens",tokens)
-		return super.processAllTokens(tokens);
 	}
 }
 

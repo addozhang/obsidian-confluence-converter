@@ -1,4 +1,4 @@
-# Obsidian Confluence Toolkit Plugin
+# Confluence Converter
 
 This plugin for [Obsidian](https://obsidian.md) enables seamless interaction with Confluence.
 
@@ -9,9 +9,10 @@ This plugin for [Obsidian](https://obsidian.md) enables seamless interaction wit
 
 ## Installation
 
-1. Download the latest release from the [Releases](https://github.com/addozhang/obsidian-confluence-converter/releases) page.
-2. Extract the contents into the `.obsidian/plugins` folder in your vault.
-3. Enable the plugin from the Obsidian settings.
+1. Search for "Confluence Converter" in the Obsidian Community Plugins browser.
+2. Install the plugin.
+3. Enable the plugin in the Obsidian settings.
+4. Use the plugin command to convert Markdown content to Confluence Wiki Markup.
 
 ## Usage
 

@@ -130,11 +130,8 @@ export class AtlassianWikiMarkupRenderer extends Renderer {
 		this.rendererOptions = rendererOptions;
 	}
 
-	public paragraph({text, tokens}: Tokens.Paragraph): string {
-		let out = '';
-		if (tokens.length > 0) {
-			out = this.parser.parseInline(tokens, this);
-		}
+	public paragraph({tokens}: Tokens.Paragraph): string {
+		let out = this.parser.parseInline(tokens, this);
 		const replacedText = replaceSingleNewlineWithSpace(
 			out,
 			this.rendererOptions
@@ -143,36 +140,28 @@ export class AtlassianWikiMarkupRenderer extends Renderer {
 		return `${unescapedText}\n\n`;
 	}
 
-	public heading({text, depth}: Tokens.Heading): string {
-		return `h${depth}. ${text}\n\n`;
+	public heading({tokens, depth}: Tokens.Heading): string {
+		return `h${depth}. ${this.parser.parseInline(tokens, this)}\n\n`;
 	}
 
-	public strong({text, tokens}: Tokens.Strong): string {
-		let out = text;
-		if(tokens[0]?.type !== "text") {
-			out = this.parser.parseInline(tokens, this);
-		}
-		return `*${out}*`;
+	public strong({tokens}: Tokens.Strong): string {
+		return `*${this.parser.parseInline(tokens, this)}*`;
 	}
 
-	public em({text, tokens}: Tokens.Em): string {
-		let out = text;
-		if(tokens[0]?.type !== "text") {
-			out = this.parser.parseInline(tokens, this);
-		}
-		return `_${out}_`;
+	public em({tokens}: Tokens.Em): string {
+		return `_${this.parser.parseInline(tokens, this)}_`;
 	}
 
-	public del({text}: Tokens.Del): string {
-		return `-${text}-`;
+	public del({tokens}: Tokens.Del): string {
+		return `-${this.parser.parseInline(tokens, this)}-`;
 	}
 
 	public codespan({text}: Tokens.Codespan): string {
 		return `{{${text}}}`;
 	}
 
-	public blockquote({text}: Tokens.Blockquote): string {
-		return `{quote}${text.trim()}{quote}\n`;
+	public blockquote({tokens}: Tokens.Blockquote): string {
+		return `{quote}${(this.parser.parse(tokens))}{quote}\n`;
 	}
 
 	public br(): string {
@@ -212,7 +201,7 @@ export class AtlassianWikiMarkupRenderer extends Renderer {
 	public listitem(item: Tokens.ListItem): string {
 		let itemBody = '';
 		if (item.tokens[0]?.type === "text") {
-			itemBody += `${item.tokens[0].text}\n`;
+			itemBody += `${this.parser.parseInline(item.tokens[0]?.tokens || [], this)}\n`;
 		}
 		if (item.tokens.length > 1) {
 			itemBody += this.parser.parse(item.tokens.slice(1), !!item.loose);

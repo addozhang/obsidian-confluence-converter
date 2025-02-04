@@ -1,4 +1,4 @@
-import {MarkdownView, Notice, Plugin} from 'obsidian';
+import {Editor, MarkdownView, Notice, Plugin} from 'obsidian';
 import {marked} from "marked";
 import {AtlassianWikiMarkupRenderer, CodeBlockTheme, MarkdownToAtlassianWikiMarkupOptions} from "./confluenceRender";
 import ConverterSettingTab from "./converterSettingTab";
@@ -27,7 +27,7 @@ export default class ConfluenceConverter extends Plugin {
 			editorCheckCallback: (checking: boolean, editor, ctx) => {
 				if (ctx instanceof MarkdownView) {
 					if (!checking) {
-						this.convert2Clipboard();
+						this.convert2Clipboard(editor);
 					}
 					return true;
 				}
@@ -48,11 +48,7 @@ export default class ConfluenceConverter extends Plugin {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, (await this.loadData()) as ConverterSettings);
 	}
 
-	private async convert2Clipboard() {
-		const editor = this.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
-		if(!editor) {
-			return
-		}
+	private async convert2Clipboard(editor: Editor) {
 		const options: MarkdownToAtlassianWikiMarkupOptions = {
 			codeBlock: {
 				theme: CodeBlockTheme[this.settings.codeBlockTheme as keyof typeof CodeBlockTheme],

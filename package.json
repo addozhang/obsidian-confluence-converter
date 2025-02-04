@@ -1,11 +1,11 @@
 {
 	"name": "confluence-converter",
-	"version": "0.2.1",
+	"version": "0.2.2",
 	"description": "Convert markdown to Confluence wiki markup.",
 	"main": "main.js",
 	"scripts": {
-		"build": "obsidian-plugin build main.ts",
-		"dev": "obsidian-plugin dev main.ts"
+		"build": "obsidian-plugin build src/main.ts",
+		"dev": "obsidian-plugin dev src/main.ts"
 	},
 	"keywords": [],
 	"author": "addozhang",

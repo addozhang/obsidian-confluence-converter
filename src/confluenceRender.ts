@@ -160,6 +160,14 @@ export class AtlassianWikiMarkupRenderer extends Renderer {
 		return `{{${text}}}`;
 	}
 
+	public text(token: Tokens.Text | Tokens.Escape): string {
+		// Match Obsidian image syntax: ![[filename.png]]
+		const text = token.text.replace(/!\[\[(.*?)\]\]/g, (match, filename) => {
+			return `!${filename}!`;
+		});
+		return super.text({ ...token, text });
+	}
+
 	public blockquote({tokens}: Tokens.Blockquote): string {
 		return `{quote}${(this.parser.parse(tokens))}{quote}\n`;
 	}

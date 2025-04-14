@@ -25,6 +25,8 @@ import escapeStringRegexp from "escape-string-regexp";
 import {Renderer, Tokens} from "marked";
 
 import {AtlassianSupportLanguage, markdownToWikiMarkupLanguageMapping,} from "./language";
+import {text} from "node:stream/consumers";
+import {type} from "node:os";
 
 export const CodeBlockTheme = {
 	DJango: "DJango",
@@ -247,7 +249,7 @@ export class AtlassianWikiMarkupRenderer extends Renderer {
 		out += `|${headerBody}|`
 		rows.forEach(row => {
 			let rowBody = row
-				.map(cell => cell.text.replace('<br>', '\\\\') || ' ')
+				.map(cell => this.tablecell(cell))
 				.join('|');
 			out += `\n|${rowBody}|`
 		})
@@ -279,14 +281,17 @@ export class AtlassianWikiMarkupRenderer extends Renderer {
 		return `${text}${rowCloseType}\n`;
 	}
 
-	public tablecell({text, header}: Tokens.TableCell): string {
+	public tablecell({text, tokens, header}: Tokens.TableCell): string {
 		const type = header
 			? TableCellTypeCharacter.Header
 			: TableCellTypeCharacter.NonHeader;
-		const emptyComplementedContent = text === "" ? "\u{0020}" : text;
+		const emptyComplementedContent = text === "" ? "\u{0020}" : this.parser.parseInline(tokens, this);
 		return `${type}${emptyComplementedContent}`;
 	}
 
+	html({text}: Tokens.HTML | Tokens.Tag): string {
+		return text.replaceAll('<br>', '\n');
+	}
 
 	public code({text, lang, escaped}: Tokens.Code): string {
 		const theme =

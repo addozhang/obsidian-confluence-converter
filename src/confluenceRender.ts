@@ -199,10 +199,7 @@ export class AtlassianWikiMarkupRenderer extends Renderer {
 		body = body.trim()
 			.split('\n')
 			.filter((line) => !!line)
-			.map(line => line.match(confluenceListRegExp)
-				? `${type}${line}`
-				: `${type} ${line}`
-			)
+			.map(line => line.startsWith(`${type} `) ? `${type}${line}` : `${type} ${line}`) // check if embeded list
 			.join('\n');
 		return `${body}\n\n`;
 	}

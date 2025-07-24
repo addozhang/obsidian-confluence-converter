@@ -247,8 +247,8 @@ export class AtlassianWikiMarkupRenderer extends Renderer {
 		rows.forEach(row => {
 			let rowBody = row
 				.map(cell => this.tablecell(cell))
-				.join('|');
-			out += `\n|${rowBody}|`
+				.join('');
+			out += `\n${rowBody}|`
 		})
 
 		return `${out}\n`;

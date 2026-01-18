@@ -17,6 +17,12 @@ bower_components/
 dist/
 build/
 
+# Testing
+coverage/
+junit.xml
+*.test.js
+*.test.js.map
+
 # TypeScript
 *.tsbuildinfo
 

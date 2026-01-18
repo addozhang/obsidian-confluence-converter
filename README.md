@@ -57,6 +57,34 @@ Configure a custom keyboard shortcut for quick conversion:
 
 Currently, the plugin works out of the box with no required configuration.
 
+## Testing
+
+The plugin includes a comprehensive test suite using Jest and TypeScript.
+
+### Run Tests
+
+```bash
+# Install dependencies
+npm install
+
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Generate coverage report
+npm run test:coverage
+```
+
+### Test Coverage
+
+- **Unit Tests** ([`tests/confluenceRender.test.ts`](tests/confluenceRender.test.ts)): Test individual conversion functions
+- **Integration Tests** ([`tests/integration.test.ts`](tests/integration.test.ts)): Test full document conversion using sample files
+- **Sample Files** ([`test-samples/`](test-samples/)): Comprehensive Markdown and Confluence markup examples
+
+See [`tests/README.md`](tests/README.md) for detailed testing documentation.
+
 ## Development
 
 Contributions to this plugin are welcome. To contribute:

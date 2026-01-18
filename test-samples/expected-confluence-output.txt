@@ -1,0 +1,446 @@
+h1. Comprehensive Markdown Test Sample
+
+This document contains examples of all Markdown syntax elements that the Obsidian Confluence Toolkit plugin should convert to Confluence Wiki Markup.
+
+h2. Text Formatting
+
+*Bold text* using double asterisks
+_Italic text_ using single asterisks
+-Strikethrough text- using double tildes
+{{Inline code}} using backticks
+
+You can also use _underscores for italic_ and *double underscores for bold*.
+
+h2. Headings
+
+h1. Heading Level 1
+
+h2. Heading Level 2
+
+h3. Heading Level 3
+
+h4. Heading Level 4
+
+h5. Heading Level 5
+
+h6. Heading Level 6
+
+h2. Lists
+
+h3. Unordered Lists
+
+* First level item
+* Another first level item
+** Second level nested item
+** Another second level item
+* ** Third level nested item
+* Back to first level
+
+Alternative bullet style:
+
+* Item with dash
+* Another item with dash
+** Nested with dash
+
+h3. Ordered Lists
+
+# First item
+# Second item
+## Nested numbered item
+## Another nested item
+# ## Deep nested item
+# Third item at first level
+
+h3. Mixed Lists
+
+# Numbered item
+# * Bullet under numbered
+# * Another bullet
+# Nested number
+# Back to numbered
+
+h3. Task Lists
+
+* Incomplete task
+* Completed task
+* Another incomplete task
+** Completed subtask
+** Incomplete subtask
+
+h2. Links
+
+h3. External Links
+
+[Atlassian|http://www.atlassian.com]
+[Atlassian Website|http://www.atlassian.com]
+[http://www.example.com|http://www.example.com]
+
+h3. Reference Links
+
+[Link to Atlassian|http://www.atlassian.com]
+[Another reference|http://www.example.com]
+
+h2. Images
+
+h3. Simple Images
+
+!image.png|alt=Alt text!
+!http://example.com/image.jpg|alt=Remote image!
+
+h3. Obsidian-style Images
+
+!screenshot.png!
+!diagram.svg!
+
+h3. Images with Title
+
+!image.png|alt=My Image,title=Click to enlarge!
+!screenshot.jpg|alt=Screenshot,title=Application Screenshot!
+
+h2. Tables
+
+h3. Simple Table
+
+||Header 1||Header 2||Header 3||
+||Cell 1||Cell 2||Cell 3|
+||Cell 4||Cell 5||Cell 6|
+h3. Table with Alignment
+
+||Left Aligned||Center Aligned||Right Aligned||
+||Left||Center||Right|
+||Text||Text||Text|
+h3. Complex Table
+
+||Column A||Column B||Column C||
+||*Bold*||_Italic_||-Strike-|
+||{{code}}||[Link|http://example.com]||!img.png|alt=image!|
+||Item 1
+Item 2||Multi
+Line||Content|
+h2. Code Blocks
+
+h3. JavaScript Code
+
+{code:collapse=false|language=javascript|linenumbers=true|theme=Confluence}
+function hello() {
+    console.log("Hello, World!");
+    return true;
+}
+
+const greeting = hello();
+{code}
+
+h3. Python Code with Comments
+
+{code:collapse=false|language=python|linenumbers=true|theme=Confluence}
+def fibonacci(n):
+    """Calculate fibonacci number recursively."""
+    if n <= 1:
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)
+
+result = fibonacci(10)
+print(f"Result: {result}")
+{code}
+
+h3. Java Code
+
+{code:collapse=false|language=java|linenumbers=true|theme=Confluence}
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+        
+        for (int i = 0; i < 10; i++) {
+            System.out.println("Count: " + i);
+        }
+    }
+}
+{code}
+
+h3. SQL Query
+
+{code:collapse=false|language=sql|linenumbers=true|theme=Confluence}
+SELECT u.username, u.email, o.order_date, o.total
+FROM users u
+INNER JOIN orders o ON u.user_id = o.user_id
+WHERE o.order_date >= '2024-01-01'
+ORDER BY o.order_date DESC
+LIMIT 100;
+{code}
+
+h3. Shell Script
+
+{code:collapse=false|language=bash|linenumbers=true|theme=Confluence}
+#!/bin/bash
+
+echo "Starting deployment..."
+
+for service in api frontend database; do
+    echo "Deploying $service..."
+    docker-compose up -d $service
+done
+
+echo "Deployment complete!"
+{code}
+
+h3. TypeScript
+
+{code:collapse=false|language=none|linenumbers=true|theme=Confluence}
+interface User {
+    id: number;
+    name: string;
+    email: string;
+}
+
+function getUser(id: number): Promise<User> {
+    return fetch(`/api/users/${id}`)
+        .then(response => response.json());
+}
+{code}
+
+h3. JSON
+
+{code:collapse=false|language=json|linenumbers=true|theme=Confluence}
+{
+    "name": "confluence-converter",
+    "version": "0.3.3",
+    "description": "Convert markdown to Confluence wiki markup",
+    "dependencies": {
+        "marked": "^15.0.4",
+        "escape-string-regexp": "^5.0.0"
+    }
+}
+{code}
+
+h3. Code without Language
+
+{code:collapse=false|language=none|linenumbers=true|theme=Confluence}
+Plain code block without language specification.
+No syntax highlighting applied.
+    Indentation preserved.
+{code}
+
+h2. Blockquotes
+
+{quote}This is a block quote.
+It can span multiple lines.
+
+And include multiple paragraphs.
+
+{quote}
+h3. Nested Blockquotes
+
+{quote}First level quote
+
+{quote}Second level quote
+
+{quote}Third level quote
+
+{quote}
+{quote}
+{quote}
+h3. Blockquote with Formatting
+
+{quote}*Bold text in quote*
+
+_Italic text in quote_
+
+{{Code in quote}}
+
+* List in quote
+* Another item
+
+{quote}
+h2. Horizontal Rules
+
+Text above the line.
+
+----
+Text below the line.
+
+Alternative styles:
+
+----
+----
+h2. Line Breaks
+
+Line one
+Line two with two spaces at end
+
+Line three after blank line
+
+Hard break
+using HTML tag
+
+h2. HTML Elements
+
+<p>Paragraph with HTML tag</p>
+
+<div>Division element</div>
+
+
+
+
+<strong>Bold with HTML</strong>
+<em>Italic with HTML</em>
+<code>Code with HTML</code>
+
+h2. Escaping Special Characters
+
+Use backslash to escape:
+
+* Not a list item
+# Not a heading
+[ Not a link
+` Not code
+
+h2. Mixed Content Examples
+
+h3. Lists with Code
+
+# First, install dependencies:
+# {code:collapse=false|language=bash|linenumbers=true|theme=Confluence}
+# npm install
+# {code}
+# Then, run the build:
+# {code:collapse=false|language=bash|linenumbers=true|theme=Confluence}
+# npm run build
+# {code}
+# Finally, test the plugin
+
+h3. Lists with Blockquotes
+
+* Important note:
+* {quote}Always back up your vault before installing plugins
+* {quote}
+* Another consideration:
+* {quote}Test in a safe environment first
+* {quote}
+
+h3. Tables with Code
+
+||Language||Example||Output||
+||JavaScript||{{console.log('Hi')}}||Prints to console|
+||Python||{{print('Hi')}}||Prints to stdout|
+||Ruby||{{puts 'Hi'}}||Prints to stdout|
+h2. Complex Nested Structures
+
+h3. Deeply Nested Lists
+
+# Top level
+## Second level
+# ## Third level
+## ## Fourth level
+# ## ## Fifth level
+# ## Back to third
+## Back to second
+# Back to top
+
+h3. Mixed Nested Lists
+
+* Bullet item
+* # Numbered under bullet
+* # * Bullet under number
+* # * # Number under bullet under number
+* # * # * Bullet under number under bullet under number
+* # * Back to bullet
+* # Back to numbered
+* Back to bullet
+
+h2. Special Markdown Features
+
+h3. Obsidian Wikilinks
+
+[[Page Name]]
+[[Folder/Page Name]]
+[[Page Name|Display Text]]
+[[Page Name#Heading]]
+
+h3. Footnotes
+
+Here's a sentence with a footnote[^1].
+
+Another sentence with a footnote[^note].
+
+[^1]: This is the first footnote.
+[^note]: This is a named footnote.
+
+h3. Abbreviations
+
+The HTML specification is maintained by the W3C.
+
+*[HTML]: Hyper Text Markup Language
+*[W3C]: World Wide Web Consortium
+
+h3. Definition Lists
+
+Term 1
+:   Definition 1a
+:   Definition 1b
+
+Term 2
+:   Definition 2
+
+h2. Edge Cases
+
+h3. Empty Elements
+
+Empty paragraph:
+
+Empty blockquote:
+
+{quote}{quote}
+Empty list:
+
+* 
+
+h3. Special Characters
+
+Ampersand: &
+Less than: <
+Greater than: >
+Quotes: "text"
+Apostrophe: isn't
+
+h3. URLs in Text
+
+Visit [http://example.com|http://example.com] for more info.
+Email: [user@example.com|mailto:user@example.com]
+
+h3. Multiple Blank Lines
+
+Multiple blank lines above and below.
+
+h3. Inline HTML with Markdown
+
+This is <em>_emphasized_</em> text.
+
+<div>
+**Bold** in a div.
+</div>
+
+h2. Unicode and Emoji
+
+Unicode characters: © ® ™ € £ ¥
+Emoji: 😀 🎉 ✅ ❌ ⚠️ 📝 🚀
+
+h2. Mathematical Expressions (if supported)
+
+Inline math: $E = mc^2$
+
+Block math:
+$$
+\int_0^\infty e^{-x^2} dx = \frac{\sqrt{\pi}}{2}
+$$
+
+h2. End of Test Sample
+
+This comprehensive Markdown sample covers most syntax elements that the Obsidian Confluence Toolkit plugin should handle. Use this file to test the conversion from Markdown to Confluence Wiki Markup.
+
+*Test Instructions:*
+
+# Open this file in Obsidian
+# Run the &quot;Convert to Confluence&quot; command
+# Paste the result into Confluence
+# Verify all elements render correctly
+

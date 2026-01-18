@@ -287,7 +287,7 @@ export class AtlassianWikiMarkupRenderer extends Renderer {
 	}
 
 	html({text}: Tokens.HTML | Tokens.Tag): string {
-		return text.replaceAll('<br>', '\n');
+		return text.replace(/<br>/g, '\n');
 	}
 
 	public code({text, lang, escaped}: Tokens.Code): string {

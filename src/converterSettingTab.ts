@@ -24,6 +24,7 @@ export default class ConverterSettingTab extends PluginSettingTab {
 				dd.setValue(this.plugin.settings.outputFormat);
 				dd.onChange(async (value) => {
 					this.plugin.settings.outputFormat = value as OutputFormat;
+					await this.plugin.saveData(this.plugin.settings);
 					this.display(); // Refresh to show/hide theme option
 				});
 			});
@@ -39,6 +40,7 @@ export default class ConverterSettingTab extends PluginSettingTab {
 					const width = parseInt(value);
 					if (!isNaN(width) && width >= 0) {
 						this.plugin.settings.defaultImageWidth = width;
+						await this.plugin.saveData(this.plugin.settings);
 					}
 				});
 			});
@@ -57,6 +59,7 @@ export default class ConverterSettingTab extends PluginSettingTab {
 					dd.setValue(this.plugin.settings.codeBlockTheme);
 					dd.onChange(async (value) => {
 						this.plugin.settings.codeBlockTheme = value;
+						await this.plugin.saveData(this.plugin.settings);
 					});
 				});
 		}
@@ -68,6 +71,7 @@ export default class ConverterSettingTab extends PluginSettingTab {
 				toggle.setValue(this.plugin.settings.codeBlockShowLineNumbers);
 				toggle.onChange(async (value) => {
 					this.plugin.settings.codeBlockShowLineNumbers = value;
+					await this.plugin.saveData(this.plugin.settings);
 				});
 			});
 
@@ -78,6 +82,7 @@ export default class ConverterSettingTab extends PluginSettingTab {
 				toggle.setValue(this.plugin.settings.codeBlockCollapse);
 				toggle.onChange(async (value) => {
 					this.plugin.settings.codeBlockCollapse = value;
+					await this.plugin.saveData(this.plugin.settings);
 				});
 			});
 	}

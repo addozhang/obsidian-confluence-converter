@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.5.3] - 2026-01-26
 
 ### Fixed
+- **Settings auto-save** - Fixed issue where settings were only saved when closing the settings panel
+  - All settings now save immediately when changed (Output Format, Image Width, Code Block options)
+  - Users no longer need to close settings panel for changes to take effect
+  - Fixes issue where image width setting wasn't applied immediately
 - **Curly braces in inline code** - Fixed issue where `{...}` in inline code could conflict with Confluence macro syntax
   - Curly braces in inline code now properly escaped in Wiki Markup format (e.g., `{{/api/users/\{user-id\}/name}}`)
   - Storage Format handles curly braces correctly within `<code>` tags (no escaping needed)
@@ -15,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - All 126 tests passing
 
 ### Technical Details
+- Added `await this.plugin.saveData(this.plugin.settings)` to all onChange handlers in `converterSettingTab.ts`
 - Enhanced `codespan()` method in `AtlassianWikiMarkupRenderer` to escape `{` and `}` characters
 - Prevents conflicts with Confluence macro syntax like `{macro:param=value}`
 - Storage Format renderer already handles this correctly via HTML escaping

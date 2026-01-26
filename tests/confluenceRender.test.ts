@@ -185,6 +185,30 @@ describe("AtlassianWikiMarkupRenderer", () => {
 			const result = marked.parse(markdown, { renderer, async: false }) as string;
 			expect(result.trim()).toContain("!screenshot.png!");
 		});
+	
+		test("should apply default width to image", () => {
+			const options: MarkdownToAtlassianWikiMarkupOptions = {
+				image: {
+					defaultWidth: 500
+				}
+			};
+			const customRenderer = new AtlassianWikiMarkupRenderer(options);
+			const markdown = "![Alt text](image.png)";
+			const result = marked.parse(markdown, { renderer: customRenderer, async: false }) as string;
+			expect(result.trim()).toContain("!image.png|alt=Alt text,width=500!");
+		});
+	
+		test("should include width with other image params", () => {
+			const options: MarkdownToAtlassianWikiMarkupOptions = {
+				image: {
+					defaultWidth: 600
+				}
+			};
+			const customRenderer = new AtlassianWikiMarkupRenderer(options);
+			const markdown = '![Alt](image.png "Title")';
+			const result = marked.parse(markdown, { renderer: customRenderer, async: false }) as string;
+			expect(result.trim()).toContain("!image.png|alt=Alt,title=Title,width=600!");
+		});
 	});
 
 	describe("Code Blocks", () => {

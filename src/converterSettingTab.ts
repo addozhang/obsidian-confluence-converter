@@ -28,6 +28,21 @@ export default class ConverterSettingTab extends PluginSettingTab {
 				});
 			});
 
+		// Image Settings
+		new Setting(containerEl)
+			.setName("Default image width")
+			.setDesc("Set default width for images in pixels (0 = original size, recommended: 400-800)")
+			.addText(text => {
+				text.setPlaceholder("0");
+				text.setValue(String(this.plugin.settings.defaultImageWidth));
+				text.onChange(async (value) => {
+					const width = parseInt(value);
+					if (!isNaN(width) && width >= 0) {
+						this.plugin.settings.defaultImageWidth = width;
+					}
+				});
+			});
+
 		const codeBlock = containerEl.createDiv();
 
 		// Code block theme - only for Wiki Markup format

@@ -47,6 +47,9 @@ export type MarkdownToAtlassianWikiMarkupOptions = {
 			| boolean
 			| ((code: string, lang: AtlassianSupportLanguage) => boolean);
 	};
+	image?: {
+		defaultWidth?: number; // Default width in pixels (undefined means original size)
+	};
 	replaceNewLinesInParagraphs?: boolean | string;
 };
 
@@ -249,13 +252,20 @@ export class AtlassianWikiMarkupRenderer extends Renderer {
 	}
 
 	public image({href, title, text}: Tokens.Image): string {
-		const params = {
-			alt: text,
-			title: title,
-		};
+		const params: Record<string, string | number | null> = {};
+		
+		if (text) params.alt = text;
+		if (title) params.title = title;
+		
+		// Apply default width if configured
+		const width = this.rendererOptions?.image?.defaultWidth;
+		if (width) {
+			params.width = width;
+		}
+		
 		const paramsString = Object.entries(params)
 			.filter(([, value]) => {
-				return value !== null && value.trim() !== "";
+				return value !== null && value !== "" && String(value).trim() !== "";
 			})
 			// Sort by key to prevent the order from changing in the way of defining params
 			.sort((a, b) => (a[0] > b[0] ? 1 : -1))

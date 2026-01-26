@@ -7,17 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.5.1] - 2026-01-26
 
+### Added
+- **Image size control** - New setting to specify default width for images
+  - Configurable default image width in pixels (0 = original size)
+  - Applies to both Storage Format and Wiki Markup output
+  - Recommended values: 400-800 pixels
+  - Automatic aspect ratio preservation
+
 ### Fixed
 - **Multi-level nested lists bug in Wiki Markup format** - Fixed the issue where 3+ level nested lists were not correctly converted
   - Added detection for markdown list markers in text content
   - Implemented indentation-based nesting level calculation (2 spaces per level)
   - Added comprehensive test cases for multi-level nested lists (both ordered and unordered)
-  - All 113 tests passing
+  - All 117 tests passing
 
 ### Technical Details
+- Added `image.defaultWidth` option to both renderer types (`MarkdownToAtlassianWikiMarkupOptions` and `MarkdownToStorageFormatOptions`)
 - Enhanced `list()` method in `AtlassianWikiMarkupRenderer` to handle markdown-formatted list items that Marked parser treats as plain text
 - Added `markdownListRegExp` to detect markdown list markers (`*`, `-`, `+`, `1.`, etc.)
 - Fixed test markdown strings to use `Array.join()` instead of template strings to avoid tab contamination
+- New test cases for image width functionality (4 new tests)
 
 ## [0.5.0] - 2026-01-26
 

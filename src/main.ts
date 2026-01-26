@@ -11,6 +11,7 @@ interface ConverterSettings {
 	codeBlockTheme: string;
 	codeBlockShowLineNumbers: boolean;
 	codeBlockCollapse: boolean;
+	defaultImageWidth: number;
 }
 
 const DEFAULT_SETTINGS: ConverterSettings = {
@@ -18,6 +19,7 @@ const DEFAULT_SETTINGS: ConverterSettings = {
 	codeBlockTheme: "Confluence",
 	codeBlockShowLineNumbers: false,
 	codeBlockCollapse: false,
+	defaultImageWidth: 0, // 0 means no width limit (original size)
 }
 
 export default class ConfluenceConverter extends Plugin {
@@ -63,6 +65,9 @@ export default class ConfluenceConverter extends Plugin {
 				codeBlock: {
 					showLineNumbers: this.settings.codeBlockShowLineNumbers,
 					collapse: this.settings.codeBlockCollapse
+				},
+				image: {
+					defaultWidth: this.settings.defaultImageWidth > 0 ? this.settings.defaultImageWidth : undefined
 				}
 			};
 			converted = marked.parse(content, {
@@ -76,6 +81,9 @@ export default class ConfluenceConverter extends Plugin {
 					theme: CodeBlockTheme[this.settings.codeBlockTheme as keyof typeof CodeBlockTheme],
 					showLineNumbers: this.settings.codeBlockShowLineNumbers,
 					collapse: this.settings.codeBlockCollapse
+				},
+				image: {
+					defaultWidth: this.settings.defaultImageWidth > 0 ? this.settings.defaultImageWidth : undefined
 				}
 			};
 			converted = marked.parse(content, {

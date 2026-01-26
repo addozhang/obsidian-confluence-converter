@@ -144,6 +144,32 @@ describe("ConfluenceStorageRenderer", () => {
 			const result = marked.parse(markdown, { renderer, async: false }) as string;
 			expect(result).toContain('<ri:attachment ri:filename="screenshot.png"');
 		});
+	
+		test("should apply default width to external image", () => {
+			const options: MarkdownToStorageFormatOptions = {
+				image: {
+					defaultWidth: 500
+				}
+			};
+			const customRenderer = new ConfluenceStorageRenderer(options);
+			const markdown = "![Alt text](https://example.com/image.png)";
+			const result = marked.parse(markdown, { renderer: customRenderer, async: false }) as string;
+			expect(result).toContain('<ac:image alt="Alt text" ac:width="500">');
+			expect(result).toContain('<ri:url ri:value="https://example.com/image.png"');
+		});
+	
+		test("should apply default width to local image", () => {
+			const options: MarkdownToStorageFormatOptions = {
+				image: {
+					defaultWidth: 600
+				}
+			};
+			const customRenderer = new ConfluenceStorageRenderer(options);
+			const markdown = "![Alt](image.png)";
+			const result = marked.parse(markdown, { renderer: customRenderer, async: false }) as string;
+			expect(result).toContain('ac:width="600"');
+			expect(result).toContain('<ri:attachment ri:filename="image.png"');
+		});
 	});
 
 	describe("Code Blocks", () => {

@@ -10,6 +10,9 @@ export type MarkdownToStorageFormatOptions = {
 		showLineNumbers?: boolean | ((code: string, lang: AtlassianSupportLanguage) => boolean);
 		collapse?: boolean | ((code: string, lang: AtlassianSupportLanguage) => boolean);
 	};
+	image?: {
+		defaultWidth?: number; // Default width in pixels (undefined means original size)
+	};
 };
 
 /**
@@ -123,13 +126,17 @@ export class ConfluenceStorageRenderer extends Renderer {
 		const altAttr = text ? ` alt="${this.escapeHtml(text)}"` : "";
 		const titleAttr = title ? ` title="${this.escapeHtml(title)}"` : "";
 		
+		// Apply default width if configured
+		const width = this.rendererOptions?.image?.defaultWidth;
+		const widthAttr = width ? ` ac:width="${width}"` : "";
+		
 		// If it's an attachment (local file), use Confluence attachment format
 		if (!href.startsWith("http://") && !href.startsWith("https://")) {
-			return `<ac:image${altAttr}><ri:attachment ri:filename="${this.escapeHtml(href)}" /></ac:image>`;
+			return `<ac:image${altAttr}${widthAttr}><ri:attachment ri:filename="${this.escapeHtml(href)}" /></ac:image>`;
 		}
 		
 		// External URL image
-		return `<ac:image${altAttr}><ri:url ri:value="${this.escapeHtml(href)}" /></ac:image>`;
+		return `<ac:image${altAttr}${widthAttr}><ri:url ri:value="${this.escapeHtml(href)}" /></ac:image>`;
 	}
 
 	public table({header, rows}: Tokens.Table): string {

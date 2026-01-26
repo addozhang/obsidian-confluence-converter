@@ -71,6 +71,12 @@ Access plugin settings via Settings > Confluence Converter:
 - **Storage Format (XHTML)** *(Recommended)* - Generates Confluence Storage Format that can be directly pasted into the Confluence editor. No additional conversion needed!
 - **Wiki Markup** *(Legacy)* - Traditional Confluence Wiki Markup format. Requires using the Markup tool in Confluence for final insertion.
 
+### Image Settings
+- **Default Image Width** - Set default width for all images in pixels (0 = original size)
+  - Recommended values: 400-800 pixels for optimal display
+  - Applies to both Storage Format and Wiki Markup
+  - Example: Setting to 600 will resize all images to 600px width while maintaining aspect ratio
+
 ### Code Block Settings
 - **Theme** *(Wiki Markup only)* - Choose from DJango, Emacs, FadeToGrey, Midnight, RDark, Eclipse, or Confluence themes
 - **Show Line Numbers** - Display line numbers in code blocks

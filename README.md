@@ -8,10 +8,14 @@ A powerful Obsidian plugin that enables seamless conversion and interaction betw
 
 ## Features
 
-- **Markdown to Confluence Conversion**: Transform your Obsidian notes into [Confluence Wiki Markup](https://confluence.atlassian.com/doc/confluence-wiki-markup-251003035.html) with a single command
+- **Two Output Formats**:
+  - **Storage Format (XHTML)** - *Recommended* - Directly paste into Confluence editor without additional conversion
+  - **Wiki Markup** - Legacy format for those who prefer traditional Confluence wiki markup
 - **Clipboard Integration**: Automatically copy converted content to clipboard for easy pasting into Confluence
-- **Format Preservation**: Maintain heading structures, lists, code blocks, and other formatting elements during conversion
+- **Format Preservation**: Maintain heading structures, lists, code blocks, tables, and other formatting elements during conversion
 - **Syntax Highlighting**: Support for code blocks with language specification
+- **Obsidian Compatibility**: Handles Obsidian-specific syntax like `![[image.png]]`
+- **Configurable**: Customize code block themes (Wiki Markup), line numbers, and collapse settings
 
 ## Installation
 
@@ -33,17 +37,23 @@ A powerful Obsidian plugin that enables seamless conversion and interaction betw
 
 ## Usage
 
-### Basic Conversion
+### Basic Conversion (Recommended - Storage Format)
 
 1. Open any note in Obsidian, or select part of the text
 2. Use the command palette (Ctrl/Cmd+P) and search for "Convert to Confluence"
 3. Run the command
-4. The converted content will be automatically copied to your clipboard
-5. Go to the Confluence editor and follow:
-   - a. Select Insert > Markup
-   - b. Select Markdown
-   - c. Type or paste your text - the preview will show you how it will appear on your page
-   - d. Select Insert.
+4. The converted content will be automatically copied to your clipboard in **Storage Format**
+5. Go to Confluence and simply **paste (Ctrl/Cmd+V)** directly into the editor
+6. Your content will appear with perfect formatting - no additional steps needed!
+
+### Alternative - Wiki Markup Format
+
+If you prefer the traditional Wiki Markup format:
+
+1. Go to Settings > Confluence Converter
+2. Change "Output format" to "Wiki Markup - Legacy format"
+3. Follow the conversion steps above
+4. In Confluence editor, use Insert > Markup, select your text format, and paste
 
 ### Keyboard Shortcut
 
@@ -55,7 +65,16 @@ Configure a custom keyboard shortcut for quick conversion:
 
 ## Configuration
 
-Currently, the plugin works out of the box with no required configuration.
+Access plugin settings via Settings > Confluence Converter:
+
+### Output Format
+- **Storage Format (XHTML)** *(Recommended)* - Generates Confluence Storage Format that can be directly pasted into the Confluence editor. No additional conversion needed!
+- **Wiki Markup** *(Legacy)* - Traditional Confluence Wiki Markup format. Requires using the Markup tool in Confluence for final insertion.
+
+### Code Block Settings
+- **Theme** *(Wiki Markup only)* - Choose from DJango, Emacs, FadeToGrey, Midnight, RDark, Eclipse, or Confluence themes
+- **Show Line Numbers** - Display line numbers in code blocks
+- **Collapse Code Block** - Automatically collapse code blocks in Confluence
 
 ## Testing
 
@@ -79,7 +98,8 @@ npm run test:coverage
 
 ### Test Coverage
 
-- **Unit Tests** ([`tests/confluenceRender.test.ts`](tests/confluenceRender.test.ts)): Test individual conversion functions
+- **Wiki Markup Tests** ([`tests/confluenceRender.test.ts`](tests/confluenceRender.test.ts)): Test Wiki Markup conversion functions
+- **Storage Format Tests** ([`tests/confluenceStorageRender.test.ts`](tests/confluenceStorageRender.test.ts)): Test XHTML/Storage Format conversion
 - **Integration Tests** ([`tests/integration.test.ts`](tests/integration.test.ts)): Test full document conversion using sample files
 - **Sample Files** ([`test-samples/`](test-samples/)): Comprehensive Markdown and Confluence markup examples
 

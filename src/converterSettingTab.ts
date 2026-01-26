@@ -1,5 +1,5 @@
 import {App, PluginSettingTab, Setting} from "obsidian";
-import ConfluenceConverter from "./main";
+import ConfluenceConverter, {OutputFormat} from "./main";
 import {CodeBlockTheme} from "./confluenceRender";
 
 export default class ConverterSettingTab extends PluginSettingTab {
@@ -12,22 +12,39 @@ export default class ConverterSettingTab extends PluginSettingTab {
 
 	display(): void {
 		const {containerEl} = this;
-		containerEl.empty()
+		containerEl.empty();
+
+		// Output Format Setting
+		new Setting(containerEl)
+			.setName("Output format")
+			.setDesc("Choose the output format for conversion. Storage Format (recommended) can be directly pasted into Confluence editor. Wiki Markup requires using the Markup tool in Confluence.")
+			.addDropdown(dd => {
+				dd.addOption("storage", "Storage Format (XHTML) - Direct paste");
+				dd.addOption("wikimarkup", "Wiki Markup - Legacy format");
+				dd.setValue(this.plugin.settings.outputFormat);
+				dd.onChange(async (value) => {
+					this.plugin.settings.outputFormat = value as OutputFormat;
+					this.display(); // Refresh to show/hide theme option
+				});
+			});
 
 		const codeBlock = containerEl.createDiv();
 
-		new Setting(codeBlock)
-			.setName("Code block theme")
-			.setDesc("Select the code block theme.")
-			.addDropdown(dd => {
-				Object.entries(CodeBlockTheme).forEach(([key, value]) => {
-					dd.addOption(key, value);
+		// Code block theme - only for Wiki Markup format
+		if (this.plugin.settings.outputFormat === "wikimarkup") {
+			new Setting(codeBlock)
+				.setName("Code block theme")
+				.setDesc("Select the code block theme (Wiki Markup only).")
+				.addDropdown(dd => {
+					Object.entries(CodeBlockTheme).forEach(([key, value]) => {
+						dd.addOption(key, value);
+					});
+					dd.setValue(this.plugin.settings.codeBlockTheme);
+					dd.onChange(async (value) => {
+						this.plugin.settings.codeBlockTheme = value;
+					});
 				});
-				dd.setValue(this.plugin.settings.codeBlockTheme);
-				dd.onChange(async (value) => {
-					this.plugin.settings.codeBlockTheme = value;
-				});
-			});
+		}
 
 		new Setting(codeBlock)
 			.setName("Show line numbers")

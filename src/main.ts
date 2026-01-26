@@ -1,15 +1,20 @@
 import {Editor, MarkdownView, Notice, Plugin} from 'obsidian';
 import {marked} from "marked";
 import {AtlassianWikiMarkupRenderer, CodeBlockTheme, MarkdownToAtlassianWikiMarkupOptions} from "./confluenceRender";
+import {ConfluenceStorageRenderer, MarkdownToStorageFormatOptions} from "./confluenceStorageRender";
 import ConverterSettingTab from "./converterSettingTab";
 
+export type OutputFormat = "wikimarkup" | "storage";
+
 interface ConverterSettings {
+	outputFormat: OutputFormat;
 	codeBlockTheme: string;
 	codeBlockShowLineNumbers: boolean;
 	codeBlockCollapse: boolean;
 }
 
 const DEFAULT_SETTINGS: ConverterSettings = {
+	outputFormat: "storage",
 	codeBlockTheme: "Confluence",
 	codeBlockShowLineNumbers: false,
 	codeBlockCollapse: false,
@@ -49,20 +54,38 @@ export default class ConfluenceConverter extends Plugin {
 	}
 
 	private async convert2Clipboard(editor: Editor) {
-		const options: MarkdownToAtlassianWikiMarkupOptions = {
-			codeBlock: {
-				theme: CodeBlockTheme[this.settings.codeBlockTheme as keyof typeof CodeBlockTheme],
-				showLineNumbers: this.settings.codeBlockShowLineNumbers,
-				collapse: this.settings.codeBlockCollapse
-			}
-		}
 		let content = editor.getSelection() ? editor.getSelection() : editor.getValue();
-		let converted = marked.parse(content, {
-			renderer: new AtlassianWikiMarkupRenderer(options),
-			async: false,
-		});
+		let converted: string;
+
+		if (this.settings.outputFormat === "storage") {
+			// Confluence Storage Format (XHTML)
+			const options: MarkdownToStorageFormatOptions = {
+				codeBlock: {
+					showLineNumbers: this.settings.codeBlockShowLineNumbers,
+					collapse: this.settings.codeBlockCollapse
+				}
+			};
+			converted = marked.parse(content, {
+				renderer: new ConfluenceStorageRenderer(options),
+				async: false,
+			}) as string;
+		} else {
+			// Wiki Markup Format
+			const options: MarkdownToAtlassianWikiMarkupOptions = {
+				codeBlock: {
+					theme: CodeBlockTheme[this.settings.codeBlockTheme as keyof typeof CodeBlockTheme],
+					showLineNumbers: this.settings.codeBlockShowLineNumbers,
+					collapse: this.settings.codeBlockCollapse
+				}
+			};
+			converted = marked.parse(content, {
+				renderer: new AtlassianWikiMarkupRenderer(options),
+				async: false,
+			}) as string;
+		}
+
 		navigator.clipboard.writeText(converted)
-			.then(_ => new Notice("Copied to clipboard"));
+			.then(_ => new Notice(`Copied to clipboard (${this.settings.outputFormat === "storage" ? "Storage Format" : "Wiki Markup"})`));
 	}
 }
 

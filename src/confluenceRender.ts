@@ -25,8 +25,6 @@ import escapeStringRegexp from "escape-string-regexp";
 import {Renderer, Tokens} from "marked";
 
 import {AtlassianSupportLanguage, markdownToWikiMarkupLanguageMapping,} from "./language";
-import {text} from "node:stream/consumers";
-import {type} from "node:os";
 
 export const CodeBlockTheme = {
 	DJango: "DJango",

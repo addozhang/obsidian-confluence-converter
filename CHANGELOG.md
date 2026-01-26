@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.3] - 2026-01-26
+
+### Fixed
+- **Curly braces in inline code** - Fixed issue where `{...}` in inline code could conflict with Confluence macro syntax
+  - Curly braces in inline code now properly escaped in Wiki Markup format (e.g., `{{/api/users/\{user-id\}/name}}`)
+  - Storage Format handles curly braces correctly within `<code>` tags (no escaping needed)
+  - Added 9 new test cases for curly braces handling in both formats
+  - All 126 tests passing
+
+### Technical Details
+- Enhanced `codespan()` method in `AtlassianWikiMarkupRenderer` to escape `{` and `}` characters
+- Prevents conflicts with Confluence macro syntax like `{macro:param=value}`
+- Storage Format renderer already handles this correctly via HTML escaping
+
 ## [0.5.2] - 2026-01-26
 
 ### Added

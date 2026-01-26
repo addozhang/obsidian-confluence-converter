@@ -163,7 +163,10 @@ export class AtlassianWikiMarkupRenderer extends Renderer {
 	}
 
 	public codespan({text}: Tokens.Codespan): string {
-		return `{{${text}}}`;
+		// Escape curly braces in inline code to avoid conflicts with Confluence macros
+		// Confluence uses {macro:param=value} syntax, so {user-id} could be misinterpreted
+		const escapedText = text.replace(/\{/g, '\\{').replace(/\}/g, '\\}');
+		return `{{${escapedText}}}`;
 	}
 
 	public text(token: Tokens.Text | Tokens.Escape): string {

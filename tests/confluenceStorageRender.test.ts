@@ -326,4 +326,38 @@ describe("ConfluenceStorageRenderer", () => {
 			expect(result).toContain("code");
 		});
 	});
+
+	describe("Curly Braces Handling", () => {
+		test("should escape curly braces in inline code", () => {
+			const markdown = "`/api/users/{user-id}/name`";
+			const result = marked.parse(markdown, { renderer, async: false }) as string;
+			// In HTML/XML format, curly braces should NOT be a problem since they're inside <code> tags
+			// But they should still be properly handled by escapeHtml if needed
+			expect(result.trim()).toContain("<code>/api/users/{user-id}/name</code>");
+		});
+
+		test("should handle plain text with curly braces", () => {
+			const markdown = "/api/users/{user-id}/name";
+			const result = marked.parse(markdown, { renderer, async: false }) as string;
+			// Plain text curly braces are fine in HTML
+			expect(result.trim()).toContain("/api/users/{user-id}/name");
+		});
+
+		test("should handle code blocks with curly braces", () => {
+			const markdown = "```\n/api/users/{user-id}/name\n```";
+			const result = marked.parse(markdown, { renderer, async: false }) as string;
+			// Code blocks use CDATA, so curly braces are safe
+			expect(result).toContain("/api/users/{user-id}/name");
+			expect(result).toContain("<![CDATA[");
+		});
+
+		test("should handle special HTML characters with curly braces in inline code", () => {
+			const markdown = "`{\"key\": \"<value>\"}`";
+			const result = marked.parse(markdown, { renderer, async: false }) as string;
+			// HTML special characters should be escaped, but curly braces are fine
+			expect(result).toContain("&lt;value&gt;");
+			expect(result).toContain("{");
+			expect(result).toContain("}");
+		});
+	});
 });

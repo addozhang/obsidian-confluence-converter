@@ -374,4 +374,42 @@ describe("AtlassianWikiMarkupRenderer", () => {
 			expect(result).toContain("language=none");
 		});
 	});
+
+	describe("Curly Braces Handling", () => {
+		test("should escape curly braces in inline code", () => {
+			const markdown = "`/api/users/{user-id}/name`";
+			const result = marked.parse(markdown, { renderer, async: false }) as string;
+			// Curly braces should be escaped to avoid conflicts with Confluence macros
+			expect(result.trim()).toBe("{{/api/users/\\{user-id\\}/name}}");
+		});
+
+		test("should handle plain text with curly braces (NOT in code)", () => {
+			const markdown = "/api/users/{user-id}/name";
+			const result = marked.parse(markdown, { renderer, async: false }) as string;
+			// Plain text should NOT have curly braces escaped
+			expect(result.trim()).toBe("/api/users/{user-id}/name");
+		});
+
+		test("should NOT escape curly braces in code blocks", () => {
+			const markdown = "```\n/api/users/{user-id}/name\n```";
+			const result = marked.parse(markdown, { renderer, async: false }) as string;
+			// Code blocks use {code:} macro, which handles curly braces differently
+			expect(result).toContain("/api/users/{user-id}/name");
+			expect(result).toContain("{code:");
+			// Should NOT contain escaped braces
+			expect(result).not.toContain("\\{");
+		});
+
+		test("should escape multiple curly braces in inline code", () => {
+			const markdown = "`{a: {b: {c}}}`";
+			const result = marked.parse(markdown, { renderer, async: false }) as string;
+			expect(result.trim()).toBe("{{\\{a: \\{b: \\{c\\}\\}\\}}}");
+		});
+
+		test("should handle inline code with other special characters and curly braces", () => {
+			const markdown = "`GET /api/{id}?param=value`";
+			const result = marked.parse(markdown, { renderer, async: false }) as string;
+			expect(result.trim()).toBe("{{GET /api/\\{id\\}?param=value}}");
+		});
+	});
 });

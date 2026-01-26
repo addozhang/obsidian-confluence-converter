@@ -91,6 +91,60 @@ describe("AtlassianWikiMarkupRenderer", () => {
 			expect(result).toContain("## Nested first");
 			expect(result).toContain("## Nested second");
 		});
+	
+		describe("Multi-level nested lists", () => {
+			test("should handle properly indented nested unordered list", () => {
+				// Using 2-space indentation (each nested level adds 2 spaces)
+				const markdown = [
+					'* Level 1 item 1',
+					'  * Level 2 item 1',
+					'    * Level 3 item 1',
+					'    * Level 3 item 2',
+					'  * Level 2 item 2',
+					'* Level 1 item 2'
+				].join('\n');
+				
+				const result = marked.parse(markdown, { renderer, async: false }) as string;
+				
+				// Level 1 should have one *
+				expect(result).toContain("* Level 1 item 1");
+				expect(result).toContain("* Level 1 item 2");
+				
+				// Level 2 should have two **
+				expect(result).toContain("** Level 2 item 1");
+				expect(result).toContain("** Level 2 item 2");
+				
+				// Level 3 should have three ***
+				expect(result).toContain("*** Level 3 item 1");
+				expect(result).toContain("*** Level 3 item 2");
+			});
+	
+			test("should handle properly indented nested ordered list", () => {
+				// Using 3-space indentation for ordered lists (account for "1. " = 3 chars)
+				const markdown = [
+					'1. Level 1 item 1',
+					'   1. Level 2 item 1',
+					'      1. Level 3 item 1',
+					'      2. Level 3 item 2',
+					'   2. Level 2 item 2',
+					'2. Level 1 item 2'
+				].join('\n');
+				
+				const result = marked.parse(markdown, { renderer, async: false }) as string;
+				
+				// Level 1 should have one #
+				expect(result).toContain("# Level 1 item 1");
+				expect(result).toContain("# Level 1 item 2");
+				
+				// Level 2 should have two ##
+				expect(result).toContain("## Level 2 item 1");
+				expect(result).toContain("## Level 2 item 2");
+				
+				// Level 3 should have three ###
+				expect(result).toContain("### Level 3 item 1");
+				expect(result).toContain("### Level 3 item 2");
+			});
+		});
 	});
 
 	describe("Links", () => {

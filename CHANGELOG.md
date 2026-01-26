@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.1] - 2026-01-26
+
+### Fixed
+- **Multi-level nested lists bug in Wiki Markup format** - Fixed the issue where 3+ level nested lists were not correctly converted
+  - Added detection for markdown list markers in text content
+  - Implemented indentation-based nesting level calculation (2 spaces per level)
+  - Added comprehensive test cases for multi-level nested lists (both ordered and unordered)
+  - All 113 tests passing
+
+### Technical Details
+- Enhanced `list()` method in `AtlassianWikiMarkupRenderer` to handle markdown-formatted list items that Marked parser treats as plain text
+- Added `markdownListRegExp` to detect markdown list markers (`*`, `-`, `+`, `1.`, etc.)
+- Fixed test markdown strings to use `Array.join()` instead of template strings to avoid tab contamination
+
 ## [0.5.0] - 2026-01-26
 
 ### Added

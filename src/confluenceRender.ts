@@ -72,6 +72,9 @@ const confluenceListRegExp = new RegExp(
 	`^(${Object.values(ListHeadCharacter).map(escapeStringRegexp).join("|")})`
 );
 
+// RegExp to match markdown list markers (*, -, +, or 1., 2., etc.)
+const markdownListRegExp = /^(\*|-|\+|\d+\.)\s/;
+
 const replaceSingleNewlineWithSpace = (
 	text: string,
 	rendererOptions: MarkdownToAtlassianWikiMarkupOptions | undefined
@@ -194,10 +197,36 @@ export class AtlassianWikiMarkupRenderer extends Renderer {
 			let itemBody = this.listitem(item);
 			body += itemBody
 		}
+		
+		
 		body = body.trim()
 			.split('\n')
 			.filter((line) => !!line)
-			.map(line => line.startsWith(`${type} `) ? `${type}${line}` : `${type} ${line}`) // check if embeded list
+			.map(line => {
+				// Count leading spaces BEFORE trimming
+				const leadingSpaces = line.match(/^\s*/)?.[0].length || 0;
+				const trimmed = line.trim();
+				
+				
+				// Check if this is already a Confluence-formatted list item (from nested list() calls)
+				if (confluenceListRegExp.test(trimmed)) {
+					// Already has Confluence prefix, add one more level
+					return `${type}${trimmed}`;
+				}
+				
+				// Check if this is a markdown-formatted list item (marked treated as text)
+				if (markdownListRegExp.test(trimmed)) {
+					// Calculate nesting level based on indentation (2 spaces per level)
+					const nestLevel = Math.floor(leadingSpaces / 2);
+					// Remove markdown marker and add appropriate Confluence prefix
+					const content = trimmed.replace(markdownListRegExp, '');
+					const prefix = type.repeat(nestLevel + 1);
+					return `${prefix} ${content}`;
+				}
+				
+				// Regular content, add prefix with space
+				return `${type} ${trimmed}`;
+			})
 			.join('\n');
 		return `${body}\n\n`;
 	}

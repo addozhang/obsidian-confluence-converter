@@ -185,6 +185,27 @@ describe("AtlassianWikiMarkupRenderer", () => {
 			const result = marked.parse(markdown, { renderer, async: false }) as string;
 			expect(result.trim()).toContain("!screenshot.png!");
 		});
+
+		test("should apply default width to Obsidian-style image", () => {
+			const options: MarkdownToAtlassianWikiMarkupOptions = {
+				image: { defaultWidth: 500 }
+			};
+			const customRenderer = new AtlassianWikiMarkupRenderer(options);
+			const markdown = "![[screenshot.png]]";
+			const result = marked.parse(markdown, { renderer: customRenderer, async: false }) as string;
+			expect(result.trim()).toContain("!screenshot.png|width=500!");
+		});
+
+		test("should apply different width to multiple Obsidian images", () => {
+			const options: MarkdownToAtlassianWikiMarkupOptions = {
+				image: { defaultWidth: 800 }
+			};
+			const customRenderer = new AtlassianWikiMarkupRenderer(options);
+			const markdown = "![[image1.png]] and ![[image2.jpg]]";
+			const result = marked.parse(markdown, { renderer: customRenderer, async: false }) as string;
+			expect(result.trim()).toContain("!image1.png|width=800!");
+			expect(result.trim()).toContain("!image2.jpg|width=800!");
+		});
 	
 		test("should apply default width to image", () => {
 			const options: MarkdownToAtlassianWikiMarkupOptions = {

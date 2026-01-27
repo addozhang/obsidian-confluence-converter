@@ -61,8 +61,12 @@ export class ConfluenceStorageRenderer extends Renderer {
 		// Check if this contains Obsidian image syntax
 		if (text.includes("![[") && text.includes("]]")) {
 			text = text.replace(/!\[\[(.*?)\]\]/g, (match, filename) => {
+				// Apply default width if configured (same as image() method)
+				const width = this.rendererOptions?.image?.defaultWidth;
+				const widthAttr = width ? ` ac:width="${width}"` : "";
+				
 				// Return the XML structure without escaping it (it's our own generated XML)
-				return `<ac:image><ri:attachment ri:filename="${filename}" /></ac:image>`;
+				return `<ac:image${widthAttr}><ri:attachment ri:filename="${filename}" /></ac:image>`;
 			});
 			// Don't escape the XML we just generated
 			return text;

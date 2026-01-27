@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.5] - 2026-01-27
+
+### Added
+- **Obsidian wikilink image width support** - Image width settings now apply to Obsidian-style images `![[image.png]]`
+  - Previously only Markdown syntax `![alt](image.png)` supported width setting
+  - Now both syntaxes respect the `defaultImageWidth` setting
+  - Works in both Wiki Markup and Storage Format output
+  - Added 4 new test cases (2 per format) for wikilink image width
+
+### Technical Details
+- Enhanced `text()` method in both renderers to apply width to wikilink images
+- Wiki Markup: `![[image.png]]` → `!image.png|width=500!`
+- Storage Format: `![[image.png]]` → `<ac:image ac:width="500"><ri:attachment ri:filename="image.png" /></ac:image>`
+- All 130 tests passing
+
 ## [0.5.4] - 2026-01-26
 
 ### Fixed

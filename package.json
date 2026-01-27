@@ -1,6 +1,6 @@
 {
-	"name": "confluence-converter",
-	"version": "0.5.4",
+  "name": "confluence-converter",
+  "version": "0.5.5",
 	"description": "Convert markdown to Confluence wiki markup.",
 	"main": "main.js",
 	"scripts": {

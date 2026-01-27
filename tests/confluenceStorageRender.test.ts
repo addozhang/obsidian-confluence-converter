@@ -144,6 +144,29 @@ describe("ConfluenceStorageRenderer", () => {
 			const result = marked.parse(markdown, { renderer, async: false }) as string;
 			expect(result).toContain('<ri:attachment ri:filename="screenshot.png"');
 		});
+
+		test("should apply default width to Obsidian-style image", () => {
+			const options: MarkdownToStorageFormatOptions = {
+				image: { defaultWidth: 500 }
+			};
+			const customRenderer = new ConfluenceStorageRenderer(options);
+			const markdown = "![[screenshot.png]]";
+			const result = marked.parse(markdown, { renderer: customRenderer, async: false }) as string;
+			expect(result).toContain('ac:width="500"');
+			expect(result).toContain('<ri:attachment ri:filename="screenshot.png"');
+		});
+
+		test("should apply different width to multiple Obsidian images", () => {
+			const options: MarkdownToStorageFormatOptions = {
+				image: { defaultWidth: 800 }
+			};
+			const customRenderer = new ConfluenceStorageRenderer(options);
+			const markdown = "![[image1.png]] and ![[image2.jpg]]";
+			const result = marked.parse(markdown, { renderer: customRenderer, async: false }) as string;
+			expect(result).toContain('ac:width="800"');
+			expect(result).toContain('<ri:attachment ri:filename="image1.png"');
+			expect(result).toContain('<ri:attachment ri:filename="image2.jpg"');
+		});
 	
 		test("should apply default width to external image", () => {
 			const options: MarkdownToStorageFormatOptions = {

@@ -172,6 +172,11 @@ export class AtlassianWikiMarkupRenderer extends Renderer {
 	public text(token: Tokens.Text | Tokens.Escape): string {
 		// Match Obsidian image syntax: ![[filename.png]]
 		const text = token.text.replace(/!\[\[(.*?)\]\]/g, (match, filename) => {
+			// Apply default width if configured (same as image() method)
+			const width = this.rendererOptions?.image?.defaultWidth;
+			if (width) {
+				return `!${filename}|width=${width}!`;
+			}
 			return `!${filename}!`;
 		});
 		return super.text({ ...token, text });

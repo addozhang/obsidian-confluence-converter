@@ -136,11 +136,11 @@ export class ConfluenceStorageRenderer extends Renderer {
 		
 		// If it's an attachment (local file), use Confluence attachment format
 		if (!href.startsWith("http://") && !href.startsWith("https://")) {
-			return `<ac:image${altAttr}${widthAttr}><ri:attachment ri:filename="${this.escapeHtml(href)}" /></ac:image>`;
+			return `<ac:image${altAttr}${titleAttr}${widthAttr}><ri:attachment ri:filename="${this.escapeHtml(href)}" /></ac:image>`;
 		}
 		
 		// External URL image
-		return `<ac:image${altAttr}${widthAttr}><ri:url ri:value="${this.escapeHtml(href)}" /></ac:image>`;
+		return `<ac:image${altAttr}${titleAttr}${widthAttr}><ri:url ri:value="${this.escapeHtml(href)}" /></ac:image>`;
 	}
 
 	public table({header, rows}: Tokens.Table): string {

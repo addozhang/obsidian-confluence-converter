@@ -86,10 +86,5 @@ export default class ConverterSettingTab extends PluginSettingTab {
 				});
 			});
 	}
-
-
-	async hide() {
-		await this.plugin.saveData(this.plugin.settings);
-	}
 }
 

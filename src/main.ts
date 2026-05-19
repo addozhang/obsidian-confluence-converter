@@ -34,16 +34,13 @@ export default class ConfluenceConverter extends Plugin {
 			editorCheckCallback: (checking: boolean, editor, ctx) => {
 				if (ctx instanceof MarkdownView) {
 					if (!checking) {
-						this.convert2Clipboard(editor);
+						void this.convert2Clipboard(editor);
 					}
 					return true;
 				}
 				return false;
 			}
 		});
-		// this.addRibbonIcon('home', 'Confluence Wiki Markup', async () => {
-		// 	await this.convert2Clipboard();
-		// });
 		this.addSettingTab(new ConverterSettingTab(this.app, this));
 	}
 
@@ -52,11 +49,13 @@ export default class ConfluenceConverter extends Plugin {
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, (await this.loadData()) as ConverterSettings);
+		const data = (await this.loadData()) as Partial<ConverterSettings> | null;
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
 	}
 
 	private async convert2Clipboard(editor: Editor) {
-		let content = editor.getSelection() ? editor.getSelection() : editor.getValue();
+		const selection = editor.getSelection();
+		const content = selection || editor.getValue();
 		let converted: string;
 
 		if (this.settings.outputFormat === "storage") {
@@ -73,7 +72,7 @@ export default class ConfluenceConverter extends Plugin {
 			converted = marked.parse(content, {
 				renderer: new ConfluenceStorageRenderer(options),
 				async: false,
-			}) as string;
+			});
 		} else {
 			// Wiki Markup Format
 			const options: MarkdownToAtlassianWikiMarkupOptions = {
@@ -89,11 +88,16 @@ export default class ConfluenceConverter extends Plugin {
 			converted = marked.parse(content, {
 				renderer: new AtlassianWikiMarkupRenderer(options),
 				async: false,
-			}) as string;
+			});
 		}
 
-		navigator.clipboard.writeText(converted)
-			.then(_ => new Notice(`Copied to clipboard (${this.settings.outputFormat === "storage" ? "Storage Format" : "Wiki Markup"})`));
+		try {
+			await navigator.clipboard.writeText(converted);
+			new Notice(`Copied to clipboard (${this.settings.outputFormat === "storage" ? "Storage Format" : "Wiki Markup"})`);
+		} catch (e) {
+			console.error("Confluence Converter: clipboard write failed", e);
+			new Notice("Failed to copy to clipboard");
+		}
 	}
 }
 

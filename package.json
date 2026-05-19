@@ -1,11 +1,12 @@
 {
-  "name": "confluence-converter",
-  "version": "0.5.5",
+	"name": "confluence-converter",
+	"version": "0.5.5",
 	"description": "Convert markdown to Confluence wiki markup.",
 	"main": "main.js",
 	"scripts": {
 		"build": "obsidian-plugin build src/main.ts",
 		"dev": "obsidian-plugin dev src/main.ts",
+		"lint": "eslint src",
 		"test": "jest",
 		"test:watch": "jest --watch",
 		"test:coverage": "jest --coverage"
@@ -14,18 +15,21 @@
 	"author": "addozhang",
 	"license": "MIT",
 	"devDependencies": {
+		"@microsoft/eslint-plugin-sdl": "^1.1.0",
 		"@types/jest": "^29.5.12",
-		"@types/node": "^16.11.6",
-		"@typescript-eslint/eslint-plugin": "5.29.0",
-		"@typescript-eslint/parser": "5.29.0",
+		"@types/node": "^20.11.0",
 		"builtin-modules": "3.3.0",
-		"esbuild": "0.17.3",
+		"esbuild": "0.25.0",
+		"eslint": "^9.18.0",
+		"eslint-plugin-obsidianmd": "^0.1.0",
+		"globals": "^15.14.0",
 		"jest": "^29.7.0",
 		"obsidian": "latest",
 		"obsidian-plugin-cli": "^0.4.3",
 		"ts-jest": "^29.1.2",
 		"tslib": "2.4.0",
-		"typescript": "4.7.4"
+		"typescript": "^5.7.0",
+		"typescript-eslint": "^8.20.0"
 	},
 	"dependencies": {
 		"escape-string-regexp": "^4.0.0",

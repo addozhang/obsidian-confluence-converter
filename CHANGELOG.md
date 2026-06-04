@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.7] - 2026-06-04
+
+### Fixed
+- **Storage Format paste into Confluence editor** ([#3](https://github.com/addozhang/obsidian-confluence-converter/issues/3))
+  - Previously the converted Storage Format XHTML was written to the clipboard via `navigator.clipboard.writeText()`, which only exposes a `text/plain` channel. Confluence's editor never saw a rich-text payload and rendered the paste as raw text, so headings, lists, tables and code blocks all "didn't format".
+  - Storage Format output now uses `navigator.clipboard.write()` with a `ClipboardItem` that carries both `text/html` (the converted XHTML) and `text/plain` (the original Markdown).
+  - Rich-text targets (Confluence editor) now receive the formatted content; plain-text targets receive readable Markdown instead of raw `<ac:...>` XHTML.
+  - Wiki Markup output keeps the existing plain-text clipboard behaviour. Environments without `ClipboardItem` fall back to `writeText()`.
+
 ## [0.5.5] - 2026-01-27
 
 ### Added

@@ -92,12 +92,30 @@ export default class ConfluenceConverter extends Plugin {
 		}
 
 		try {
-			await navigator.clipboard.writeText(converted);
+			await this.writeConvertedToClipboard(converted, content);
 			new Notice(`Copied to clipboard (${this.settings.outputFormat === "storage" ? "Storage Format" : "Wiki Markup"})`);
 		} catch (e) {
 			console.error("Confluence Converter: clipboard write failed", e);
 			new Notice("Failed to copy to clipboard");
 		}
 	}
-}
 
+	private async writeConvertedToClipboard(converted: string, originalMarkdown: string) {
+		// Storage Format is meant to be pasted into the Confluence editor as
+		// rich content, which only happens if the clipboard exposes text/html.
+		// We additionally expose the original markdown as text/plain so that
+		// pasting into a plain-text target (terminal, search box, etc.) yields
+		// readable content instead of raw <ac:...> XHTML.
+		if (this.settings.outputFormat === "storage" && navigator.clipboard.write && typeof ClipboardItem !== "undefined") {
+			await navigator.clipboard.write([
+				new ClipboardItem({
+					"text/html": new Blob([converted], {type: "text/html"}),
+					"text/plain": new Blob([originalMarkdown], {type: "text/plain"}),
+				}),
+			]);
+			return;
+		}
+
+		await navigator.clipboard.writeText(converted);
+	}
+}

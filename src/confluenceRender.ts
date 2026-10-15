@@ -25,6 +25,7 @@ import escapeStringRegexp from "escape-string-regexp";
 import {Renderer, Tokens} from "marked";
 
 import {AtlassianSupportLanguage, markdownToWikiMarkupLanguageMapping,} from "./language";
+import {HEADING_WIKILINK_REGEXP, HeadingAnchorResolver} from "./headingAnchors";
 
 export const CodeBlockTheme = {
 	DJango: "DJango",
@@ -51,6 +52,7 @@ export type MarkdownToAtlassianWikiMarkupOptions = {
 		defaultWidth?: number; // Default width in pixels (undefined means original size)
 	};
 	replaceNewLinesInParagraphs?: boolean | string;
+	headingAnchors?: HeadingAnchorResolver; // Resolves links to headings in the same note
 };
 
 type ListHeadCharacter = {
@@ -130,10 +132,12 @@ const unescapeHtmlSpecialCharacteres = (text: string): string => {
 
 export class AtlassianWikiMarkupRenderer extends Renderer {
 	private readonly rendererOptions?: MarkdownToAtlassianWikiMarkupOptions;
+	private readonly headingAnchors: HeadingAnchorResolver;
 
 	public constructor(rendererOptions?: MarkdownToAtlassianWikiMarkupOptions) {
 		super();
 		this.rendererOptions = rendererOptions;
+		this.headingAnchors = rendererOptions?.headingAnchors ?? new HeadingAnchorResolver();
 	}
 
 	public paragraph({tokens}: Tokens.Paragraph): string {
@@ -178,6 +182,10 @@ export class AtlassianWikiMarkupRenderer extends Renderer {
 				return `!${filename}|width=${width}!`;
 			}
 			return `!${filename}!`;
+		}).replace(HEADING_WIKILINK_REGEXP, (match, headingTarget: string, alias?: string) => {
+			// Match Obsidian heading links: [[#Heading]] or [[#Parent#Heading|alias]]
+			const linkText = alias?.trim() || HeadingAnchorResolver.wikilinkDisplayText(headingTarget);
+			return `[${linkText}|${this.headingAnchors.resolve(headingTarget)}]`;
 		});
 		return super.text({ ...token, text });
 	}
@@ -196,7 +204,8 @@ export class AtlassianWikiMarkupRenderer extends Renderer {
 
 	public link({href, title, text}: Tokens.Link): string {
 		const linkAlias = text === "" ? title : text;
-		return linkAlias ? `[${linkAlias}|${href}]` : `[${href}]`;
+		const resolvedHref = href.startsWith("#") ? this.headingAnchors.resolve(href) : href;
+		return linkAlias ? `[${linkAlias}|${resolvedHref}]` : `[${resolvedHref}]`;
 	}
 
 

@@ -55,6 +55,27 @@ If you prefer the traditional Wiki Markup format:
 3. Follow the conversion steps above
 4. In Confluence editor, use Insert > Markup, select your text format, and paste
 
+### Links to Headings
+
+Links to headings in the same note are converted to Confluence heading anchors. All of these forms are supported:
+
+```markdown
+[[#Scenarios#Bootstrapping (cold start)|Bootstrapping (cold start)]]
+[Bootstrapping (cold start)](#Bootstrapping%20(cold%20start))
+[Bootstrapping (cold start)](#bootstrapping-cold-start)
+[Bootstrapping (cold start)](#Bootstrapping-(cold-start))
+```
+
+The Confluence editor drops same-page links like `#Bootstrapping-(cold-start)` when you paste. To keep them as links, create the Confluence page first, then add its URL to the note's properties:
+
+```markdown
+---
+confluence-page-url: https://your-site.atlassian.net/wiki/spaces/SPACE/pages/123456/Page+Title
+---
+```
+
+Links to headings then point at that page, e.g. `https://.../pages/123456/Page+Title#Bootstrapping-(cold-start)`. The note's frontmatter is not included in the converted output.
+
 ### Keyboard Shortcut
 
 Configure a custom keyboard shortcut for quick conversion:

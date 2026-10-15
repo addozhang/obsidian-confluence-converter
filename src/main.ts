@@ -1,8 +1,9 @@
-import {Editor, MarkdownView, Notice, Plugin} from 'obsidian';
+import {Editor, MarkdownView, Notice, Plugin, TFile} from 'obsidian';
 import {marked} from "marked";
 import {AtlassianWikiMarkupRenderer, CodeBlockTheme, MarkdownToAtlassianWikiMarkupOptions} from "./confluenceRender";
 import {ConfluenceStorageRenderer, MarkdownToStorageFormatOptions} from "./confluenceStorageRender";
 import ConverterSettingTab from "./converterSettingTab";
+import {HeadingAnchorResolver, PAGE_URL_FRONTMATTER_KEY, stripFrontmatter} from "./headingAnchors";
 
 export type OutputFormat = "wikimarkup" | "storage";
 
@@ -34,7 +35,7 @@ export default class ConfluenceConverter extends Plugin {
 			editorCheckCallback: (checking: boolean, editor, ctx) => {
 				if (ctx instanceof MarkdownView) {
 					if (!checking) {
-						void this.convert2Clipboard(editor);
+						void this.convert2Clipboard(editor, ctx.file);
 					}
 					return true;
 				}
@@ -53,10 +54,14 @@ export default class ConfluenceConverter extends Plugin {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
 	}
 
-	private async convert2Clipboard(editor: Editor) {
+	private async convert2Clipboard(editor: Editor, file: TFile | null) {
 		const selection = editor.getSelection();
-		const content = selection || editor.getValue();
+		const note = editor.getValue();
+		const content = selection || stripFrontmatter(note);
 		let converted: string;
+
+		// Headings are looked up in the whole note so that links in a selection still resolve
+		const headingAnchors = new HeadingAnchorResolver(note, this.getConfluencePageUrl(file));
 
 		if (this.settings.outputFormat === "storage") {
 			// Confluence Storage Format (XHTML)
@@ -67,7 +72,8 @@ export default class ConfluenceConverter extends Plugin {
 				},
 				image: {
 					defaultWidth: this.settings.defaultImageWidth > 0 ? this.settings.defaultImageWidth : undefined
-				}
+				},
+				headingAnchors,
 			};
 			converted = marked.parse(content, {
 				renderer: new ConfluenceStorageRenderer(options),
@@ -83,7 +89,8 @@ export default class ConfluenceConverter extends Plugin {
 				},
 				image: {
 					defaultWidth: this.settings.defaultImageWidth > 0 ? this.settings.defaultImageWidth : undefined
-				}
+				},
+				headingAnchors,
 			};
 			converted = marked.parse(content, {
 				renderer: new AtlassianWikiMarkupRenderer(options),
@@ -94,10 +101,22 @@ export default class ConfluenceConverter extends Plugin {
 		try {
 			await this.writeConvertedToClipboard(converted, content);
 			new Notice(`Copied to clipboard (${this.settings.outputFormat === "storage" ? "Storage Format" : "Wiki Markup"})`);
+			if (this.settings.outputFormat === "storage" && headingAnchors.resolvedCount > 0 && !headingAnchors.hasPageUrl) {
+				// The Confluence editor drops "#heading" links on paste; they need an absolute page URL
+				new Notice(`Links to headings will paste as plain text. Add a "${PAGE_URL_FRONTMATTER_KEY}" property with the Confluence page URL to keep them as links.`, 10000);
+			}
 		} catch (e) {
 			console.error("Confluence Converter: clipboard write failed", e);
 			new Notice("Failed to copy to clipboard");
 		}
+	}
+
+	private getConfluencePageUrl(file: TFile | null): string | undefined {
+		if (!file) {
+			return undefined;
+		}
+		const value: unknown = this.app.metadataCache.getFileCache(file)?.frontmatter?.[PAGE_URL_FRONTMATTER_KEY];
+		return typeof value === "string" ? value : undefined;
 	}
 
 	private async writeConvertedToClipboard(converted: string, originalMarkdown: string) {

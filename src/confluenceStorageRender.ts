@@ -4,6 +4,7 @@
  */
 import {Renderer, Tokens} from "marked";
 import {AtlassianSupportLanguage, markdownToWikiMarkupLanguageMapping} from "./language";
+import {HEADING_WIKILINK_REGEXP, HeadingAnchorResolver} from "./headingAnchors";
 
 export type MarkdownToStorageFormatOptions = {
 	codeBlock?: {
@@ -13,6 +14,7 @@ export type MarkdownToStorageFormatOptions = {
 	image?: {
 		defaultWidth?: number; // Default width in pixels (undefined means original size)
 	};
+	headingAnchors?: HeadingAnchorResolver; // Resolves links to headings in the same note
 };
 
 /**
@@ -21,10 +23,12 @@ export type MarkdownToStorageFormatOptions = {
  */
 export class ConfluenceStorageRenderer extends Renderer {
 	private readonly rendererOptions?: MarkdownToStorageFormatOptions;
+	private readonly headingAnchors: HeadingAnchorResolver;
 
 	public constructor(rendererOptions?: MarkdownToStorageFormatOptions) {
 		super();
 		this.rendererOptions = rendererOptions;
+		this.headingAnchors = rendererOptions?.headingAnchors ?? new HeadingAnchorResolver();
 	}
 
 	public paragraph({tokens}: Tokens.Paragraph): string {
@@ -54,26 +58,34 @@ export class ConfluenceStorageRenderer extends Renderer {
 	}
 
 	public text(token: Tokens.Text | Tokens.Escape): string {
-		// Match Obsidian image syntax: ![[filename.png]]
-		// Note: This is raw text, not HTML, so we need to handle it carefully
-		let text = token.text;
-		
-		// Check if this contains Obsidian image syntax
-		if (text.includes("![[") && text.includes("]]")) {
-			text = text.replace(/!\[\[(.*?)\]\]/g, (match, filename) => {
+		// Block-level text tokens carry their own inline tokens; let the parent render those
+		if ("tokens" in token && token.tokens) {
+			return super.text(token);
+		}
+
+		// Match Obsidian image syntax ![[filename.png]] and heading links [[#Heading|alias]].
+		// The surrounding text is escaped; the XML we generate is not.
+		const obsidianSyntax = new RegExp(`!\\[\\[(.*?)\\]\\]|${HEADING_WIKILINK_REGEXP.source}`, "g");
+		const escapeText = (text: string) => "escaped" in token && token.escaped ? text : this.escapeHtml(text);
+		let result = "";
+		let lastIndex = 0;
+		for (const match of token.text.matchAll(obsidianSyntax)) {
+			const [syntax, filename, headingTarget, alias] = match;
+			result += escapeText(token.text.slice(lastIndex, match.index));
+			lastIndex = match.index + syntax.length;
+
+			if (filename !== undefined) {
 				// Apply default width if configured (same as image() method)
 				const width = this.rendererOptions?.image?.defaultWidth;
 				const widthAttr = width ? ` ac:width="${width}"` : "";
-				
-				// Return the XML structure without escaping it (it's our own generated XML)
-				return `<ac:image${widthAttr}><ri:attachment ri:filename="${filename}" /></ac:image>`;
-			});
-			// Don't escape the XML we just generated
-			return text;
+				result += `<ac:image${widthAttr}><ri:attachment ri:filename="${this.escapeHtml(filename)}" /></ac:image>`;
+			} else {
+				const href = this.headingAnchors.resolve(headingTarget);
+				const linkText = alias?.trim() || HeadingAnchorResolver.wikilinkDisplayText(headingTarget);
+				result += `<a href="${this.escapeHtml(href)}">${this.escapeHtml(linkText)}</a>`;
+			}
 		}
-		
-		// For regular text, use parent's text handling which properly escapes
-		return super.text(token);
+		return result + escapeText(token.text.slice(lastIndex));
 	}
 
 	public blockquote({tokens}: Tokens.Blockquote): string {
@@ -91,7 +103,8 @@ export class ConfluenceStorageRenderer extends Renderer {
 
 	public link({href, title, text}: Tokens.Link): string {
 		const titleAttr = title ? ` title="${this.escapeHtml(title)}"` : "";
-		return `<a href="${this.escapeHtml(href)}"${titleAttr}>${text}</a>`;
+		const resolvedHref = href.startsWith("#") ? this.headingAnchors.resolve(href) : href;
+		return `<a href="${this.escapeHtml(resolvedHref)}"${titleAttr}>${text}</a>`;
 	}
 
 	public list({items, ordered}: Tokens.List): string {
